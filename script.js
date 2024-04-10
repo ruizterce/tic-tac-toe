@@ -60,8 +60,6 @@ function Game() {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     };
 
-    const getActivePlayer = () => activePlayer;
-
     const printNewRound = () => {
         gameBoard.printBoard();
         return console.log(`It's ${activePlayer.getName()}'s turn.`);
@@ -73,8 +71,22 @@ function Game() {
 
         gameBoard.board[row][column].addToken(token);
 
-
-        if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
+        //Check for full board
+        let fullBoard = true;
+        for (let i = 0; i < gameBoard.board.length; i++) {
+            for (let j = 0; j < gameBoard.board[i].length; j++) {
+                if (gameBoard.board[i][j].getValue() === '-') {
+                    fullBoard = false;
+                    break;
+                }
+            }
+        }
+        if (fullBoard) {
+            console.log("Full board, it's a Tie!");
+            game = Game();
+        }
+        //Check win conditions
+        else if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
             (gameBoard.board[1][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[1][2].getValue() === token) ||
             (gameBoard.board[2][0].getValue() === token && gameBoard.board[2][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
             (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][0].getValue() === token && gameBoard.board[2][0].getValue() === token) ||
@@ -84,8 +96,6 @@ function Game() {
             (gameBoard.board[2][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[0][2].getValue() === token)) {
             console.log(`${activePlayer.getName()} wins!`)
             game = Game();
-
-
         } else {
             switchTurn();
             printNewRound();
