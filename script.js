@@ -63,44 +63,51 @@ function Game() {
     const printNewRound = () => {
         gameBoard.printBoard();
         return console.log(`It's ${activePlayer.getName()}'s turn.`);
-
     }
 
     const playRound = (row, column) => {
         const token = activePlayer.getToken()
 
-        gameBoard.board[row][column].addToken(token);
+        //Check if the cell is already populated
+        if (gameBoard.board[row][column].getValue() != '-') {
+            console.log('This cell already has a token!')
+        } else {
 
-        //Check for full board
-        let fullBoard = true;
-        for (let i = 0; i < gameBoard.board.length; i++) {
-            for (let j = 0; j < gameBoard.board[i].length; j++) {
-                if (gameBoard.board[i][j].getValue() === '-') {
-                    fullBoard = false;
-                    break;
+            //Add token to the cell
+            gameBoard.board[row][column].addToken(token);
+
+            //Check for full board
+            let fullBoard = true;
+            for (let i = 0; i < gameBoard.board.length; i++) {
+                for (let j = 0; j < gameBoard.board[i].length; j++) {
+                    if (gameBoard.board[i][j].getValue() === '-') {
+                        fullBoard = false;
+                        break;
+                    }
                 }
             }
+            if (fullBoard) {
+                console.log("Full board, it's a Tie!");
+                game = Game();
+            }
+            //Check for win conditions
+            else if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
+                (gameBoard.board[1][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[1][2].getValue() === token) ||
+                (gameBoard.board[2][0].getValue() === token && gameBoard.board[2][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
+                (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][0].getValue() === token && gameBoard.board[2][0].getValue() === token) ||
+                (gameBoard.board[0][1].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[2][1].getValue() === token) ||
+                (gameBoard.board[0][2].getValue() === token && gameBoard.board[1][2].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
+                (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
+                (gameBoard.board[2][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[0][2].getValue() === token)) {
+                console.log(`${activePlayer.getName()} wins!`)
+                game = Game();
+            } 
+            //Prepare for next round
+            else {
+                switchTurn();
+                printNewRound();
+            }
         }
-        if (fullBoard) {
-            console.log("Full board, it's a Tie!");
-            game = Game();
-        }
-        //Check win conditions
-        else if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
-            (gameBoard.board[1][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[1][2].getValue() === token) ||
-            (gameBoard.board[2][0].getValue() === token && gameBoard.board[2][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
-            (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][0].getValue() === token && gameBoard.board[2][0].getValue() === token) ||
-            (gameBoard.board[0][1].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[2][1].getValue() === token) ||
-            (gameBoard.board[0][2].getValue() === token && gameBoard.board[1][2].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
-            (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
-            (gameBoard.board[2][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[0][2].getValue() === token)) {
-            console.log(`${activePlayer.getName()} wins!`)
-            game = Game();
-        } else {
-            switchTurn();
-            printNewRound();
-        }
-
     }
 
     printNewRound();
