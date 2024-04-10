@@ -76,22 +76,10 @@ function Game() {
             //Add token to the cell
             gameBoard.board[row][column].addToken(token);
 
-            //Check for full board
-            let fullBoard = true;
-            for (let i = 0; i < gameBoard.board.length; i++) {
-                for (let j = 0; j < gameBoard.board[i].length; j++) {
-                    if (gameBoard.board[i][j].getValue() === '-') {
-                        fullBoard = false;
-                        break;
-                    }
-                }
-            }
-            if (fullBoard) {
-                console.log("Full board, it's a Tie!");
-                game = Game();
-            }
+
+
             //Check for win conditions
-            else if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
+            if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
                 (gameBoard.board[1][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[1][2].getValue() === token) ||
                 (gameBoard.board[2][0].getValue() === token && gameBoard.board[2][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
                 (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][0].getValue() === token && gameBoard.board[2][0].getValue() === token) ||
@@ -101,15 +89,33 @@ function Game() {
                 (gameBoard.board[2][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[0][2].getValue() === token)) {
                 console.log(`${activePlayer.getName()} wins!`)
                 game = Game();
-            } 
-            //Prepare for next round
-            else {
-                switchTurn();
-                printNewRound();
+            } else {
+
+                //Check for full board
+                let fullBoard = true;
+                for (let i = 0; i < gameBoard.board.length; i++) {
+                    for (let j = 0; j < gameBoard.board[i].length; j++) {
+                        if (gameBoard.board[i][j].getValue() === '-') {
+                            fullBoard = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (fullBoard) {
+                    console.log("Full board, it's a Tie!");
+                    game = Game();
+                }
+                //Prepare for next round
+                else {
+                    switchTurn();
+                    printNewRound();
+                }
             }
         }
     }
 
+    //Print initial round
     printNewRound();
     return { playRound };
 }
