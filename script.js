@@ -10,18 +10,7 @@ function Gameboard() {
         }
     }
 
-    const printBoard = () => {
-        let string = "";
-        for (let i = 0; i < rows; i++) {
-            string += '\n';
-            for (let j = 0; j < columns; j++) {
-                string += board[i][j].getValue();
-            }
-        }
-        console.log(string);
-    }
-
-    return { board, printBoard }
+    return { board }
 
 };
 
@@ -47,7 +36,7 @@ function newPlayer(name, token) {
 }
 
 function Game() {
-    let gameBoard = Gameboard();
+    const gameBoard = Gameboard();
 
     const players = [
         player1 = newPlayer('Player 1', 'X'),
@@ -55,28 +44,24 @@ function Game() {
     ];
 
     let activePlayer = players[0];
+    const getActivePlayer = () => activePlayer;
+    let roundResult;
+    const getRoundResult = () => roundResult;
 
     const switchTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     };
 
-    const printNewRound = () => {
-        gameBoard.printBoard();
-        return console.log(`It's ${activePlayer.getName()}'s turn.`);
-    }
-
     const playRound = (row, column) => {
         const token = activePlayer.getToken()
-
         //Check if the cell is already populated
         if (gameBoard.board[row][column].getValue() != '-') {
-            console.log('This cell already has a token!')
+            roundResult = 'invalid';
         } else {
+
 
             //Add token to the cell
             gameBoard.board[row][column].addToken(token);
-
-
 
             //Check for win conditions
             if ((gameBoard.board[0][0].getValue() === token && gameBoard.board[0][1].getValue() === token && gameBoard.board[0][2].getValue() === token) ||
@@ -87,8 +72,7 @@ function Game() {
                 (gameBoard.board[0][2].getValue() === token && gameBoard.board[1][2].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
                 (gameBoard.board[0][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[2][2].getValue() === token) ||
                 (gameBoard.board[2][0].getValue() === token && gameBoard.board[1][1].getValue() === token && gameBoard.board[0][2].getValue() === token)) {
-                console.log(`${activePlayer.getName()} wins!`)
-                game = Game();
+                roundResult = 'win';
             } else {
 
                 //Check for full board
@@ -103,22 +87,93 @@ function Game() {
                 }
 
                 if (fullBoard) {
-                    console.log("Full board, it's a Tie!");
-                    game = Game();
+                    roundResult = 'tie';
                 }
                 //Prepare for next round
                 else {
+                    roundResult = 'valid';
                     switchTurn();
-                    printNewRound();
                 }
             }
         }
     }
 
-    //Print initial round
-    printNewRound();
-    return { playRound };
+    return {
+        playRound,
+        getActivePlayer,
+        getRoundResult,
+        gameBoard
+    };
 }
 
-let game = Game();
 
+
+function ScreenController() {
+    const startBtn = document.querySelector('#start-btn');
+
+
+    startBtn.addEventListener('click', () => {
+        startGame();
+        startBtn.textContent = 'Restart!'
+    })
+
+    const turnDiv = document.querySelector('#turn');
+    const boardDiv = document.querySelector('#board');
+    let cellsDisabled = true;
+
+    startGame = () => {
+        let game = Game();
+
+        const updateScreen = () => {
+            const gameBoard = game.gameBoard;
+
+            turnDiv.textContent = `${game.getActivePlayer().getName()}'s turn.`;
+
+            boardDiv.innerHTML = '';
+
+            for (i = 0; i < gameBoard.board.length; i++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+                boardDiv.appendChild(rowDiv);
+
+                for (j = 0; j < gameBoard.board[i].length; j++) {
+                    const cellButton = document.createElement('button');
+                    cellButton.className = 'cell';
+                    cellButton.textContent = gameBoard.board[i][j].getValue();
+                    cellButton.dataset.row = i;
+                    cellButton.dataset.column = j;
+                    rowDiv.appendChild(cellButton);
+                }
+            }
+
+        }
+
+        const clickCell = function (e) {
+            if (e.target.className === 'cell') {
+                game.playRound(e.target.dataset.row, e.target.dataset.column);
+                updateScreen();
+
+                if (game.getRoundResult() === 'win') {
+                    turnDiv.textContent = `${game.getActivePlayer().getName()} wins!`
+
+                    boardDiv.removeEventListener('click', clickCell);
+                    cellsDisabled = true
+                } else if (game.getRoundResult() === 'tie') {
+                    turnDiv.textContent = "Full Board! It's a tie!"
+
+                    boardDiv.removeEventListener('click', clickCell);
+                    cellsDisabled = true
+                } else if (game.getRoundResult() === 'invalid') {
+                    turnDiv.textContent = `Invalid move! ${game.getActivePlayer().getName()}'s turn.`;
+                }
+            }
+        };
+
+        if (cellsDisabled) {
+            boardDiv.addEventListener('click', clickCell);
+            cellsDisabled = false;
+        }
+        updateScreen();
+    }
+}
+ScreenController();
