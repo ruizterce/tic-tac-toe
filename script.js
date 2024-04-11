@@ -121,8 +121,9 @@ function ScreenController() {
     const boardDiv = document.querySelector('#board');
     let cellsDisabled = true;
 
+    let game
     startGame = () => {
-        let game = Game();
+        game = Game();
 
         const updateScreen = () => {
             const gameBoard = game.gameBoard;
