@@ -1,3 +1,4 @@
+//Gameboard factory
 function Gameboard() {
     const rows = 3;
     const columns = 3;
@@ -14,6 +15,7 @@ function Gameboard() {
 
 };
 
+//Cell factory
 function Cell() {
     let value = '-';
     const addToken = (player) => {
@@ -28,20 +30,28 @@ function Cell() {
     };
 }
 
+//Player factory
 function newPlayer(name, token) {
-    const getName = () => name;
+    let playerName = name;
+    const getName = () => playerName;
     const getToken = () => token;
-    return { getName, getToken };
+    const setName = (string) => {
+        playerName = string
+    }
+    return { getName, getToken, setName };
 
 }
 
-function Game() {
-    const gameBoard = Gameboard();
 
+//Game factory
+function Game(player1Name, player2Name) {
+    const gameBoard = Gameboard();
     const players = [
-        player1 = newPlayer('Player 1', 'X'),
-        player2 = newPlayer('Player 2', 'O')
+        newPlayer(player1Name, 'X'),
+        newPlayer(player2Name, 'O')
     ];
+
+    const getPlayers = () => players;
 
     let activePlayer = players[0];
     const getActivePlayer = () => activePlayer;
@@ -100,6 +110,7 @@ function Game() {
 
     return {
         playRound,
+        getPlayers,
         getActivePlayer,
         getRoundResult,
         gameBoard
@@ -107,31 +118,60 @@ function Game() {
 }
 
 
-
+//Main controller function
 function ScreenController() {
     const startBtn = document.querySelector('#start-btn');
 
+    //Store player name for new Game() instances
+    let player1Name = 'Player 1';
+    let player2Name = 'Player 2';
 
     startBtn.addEventListener('click', () => {
         startGame();
         startBtn.textContent = 'Restart!'
     })
 
+    const playerOneDiv = document.querySelector('#player-one');
+    const playerTwoDiv = document.querySelector('#player-two');
     const turnDiv = document.querySelector('#turn');
     const boardDiv = document.querySelector('#board');
     let cellsDisabled = true;
 
+    playerOneDiv.addEventListener('click', () => {
+        let name
+        do {
+            name = prompt('Player 1 name? (1-8 char)', 'Player 1');
+        } while (name.length < 1 || name.length > 8);
+        game.getPlayers()[0].setName(name); //Update player name in current Game();
+        playerOneDiv.innerHTML = '<p>' + game.getPlayers()[0].getName() + '</p><p>' + game.getPlayers()[0].getToken() + '</p>'//Update player name on screen
+        player1Name = name; //Store player name for next calls of Game();
+    });
+
+    playerTwoDiv.addEventListener('click', () => {
+        let name
+        do {
+            name = prompt('Player 2 name? (1-8 char)', 'Player 2');
+        } while (name.length < 1 || name.length > 8);
+        game.getPlayers()[1].setName(name); //Update player name in current Game();
+        playerTwoDiv.innerHTML = '<p>' + game.getPlayers()[1].getName() + '</p><p>' + game.getPlayers()[1].getToken() + '</p>' //Update player name on screen
+        player2Name = name; //Store player name for next calls of Game();
+    });
+
     let game
     startGame = () => {
-        game = Game();
+        game = Game(player1Name, player2Name); //Create new game
 
         const updateScreen = () => {
             const gameBoard = game.gameBoard;
 
+            //Show player and turn info
+            playerOneDiv.innerHTML = '<p>' + game.getPlayers()[0].getName() + '</p><p>' + game.getPlayers()[0].getToken() + '</p>'
+            playerTwoDiv.innerHTML = '<p>' + game.getPlayers()[1].getName() + '</p><p>' + game.getPlayers()[1].getToken() + '</p>'
             turnDiv.textContent = `${game.getActivePlayer().getName()}'s turn.`;
 
-            boardDiv.innerHTML = '';
+            boardDiv.innerHTML = ''; //Clear board div
 
+            //Update board Div
             for (i = 0; i < gameBoard.board.length; i++) {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'row';
