@@ -26,10 +26,10 @@ body {
             background-color: #4c956c;
             color: #fefee3;
             border: none;
-            border-radius: 10px;
+            border-radius: 30px;
             font-weight: 600;
             font-size: 2.7vh;
-            padding: 2.5vh 3px;
+            padding: 2.5vh 10px;
         }
 
         #start-btn:hover {
@@ -50,8 +50,8 @@ body {
             background-color: #4c956c;
             color: #fefee3;
             border: none;
-            border-radius: 10px;
-            padding: 0px 3px;
+            border-radius: 30px;
+            padding: 0px 10px;
         }
 
         .player-info:hover {
@@ -89,6 +89,6 @@ body {
     #turn {
         color: #fefee3;
         margin: 10px;
-        font-size: 1rem;
+        font-size: 3rem;
     }
 }
